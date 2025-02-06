@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Sun, Moon } from 'lucide-react'; 
 import { Search } from 'lucide-react';
 import { Movie, MovieDetails as MovieDetailsType } from './types';
 import { MovieCard } from './components/MovieCard';
@@ -17,25 +16,7 @@ function App() {
     return saved ? JSON.parse(saved) : [];
   });
 
-  const [darkMode, setDarkMode] = useState(() => {
-    return localStorage.getItem('theme') === 'dark';
-  });
-
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-    }
-  }, [darkMode]);
-
-  // Function to toggle dark mode
-  const toggleDarkMode = () => {
-    setDarkMode(prevMode => !prevMode);
-  };
-
+  
   useEffect(() => {
     localStorage.setItem('favorites', JSON.stringify(favorites));
   }, [favorites]);
@@ -100,24 +81,27 @@ function App() {
     searchMovies();
   };
 
+  // Handle showing and hiding the favorite movies
+  const toggleFavoritesDisplay = () => {
+    const favoritesSection = document.getElementById('favorites-section');
+    if (favoritesSection) {
+      favoritesSection.classList.toggle('hidden'); // Toggle the visibility of the favorites section
+    }
+  };
+
   return (
-    <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-300 text-black'}`}>
+    <div className={`min-h-screen bg-gray-900 text-gray-100'}`}>
       <header className="flex justify-between p-4 items-center">
-        <h1 className="text-2xl font-bold">Movie Search</h1>
-        {/* Dark mode toggle button with unique styling */}
+        <h1 className="text-4xl font-bold mb-6 text-blue-600">WatchWave</h1>
+        
         <button
-          onClick={toggleDarkMode}
-          className="p-2 rounded-full transition duration-300 ease-in-out shadow-md 
-          hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 
-          bg-gray-300 dark:bg-gray-700 text-black dark:text-white">
-          {darkMode ? (
-            <Sun size={26} className="text-yellow-400" /> // Sun icon for light mode with yellow color
-          ) : (
-            <Moon size={26} className="text-blue-400" /> // Moon icon for dark mode with blue color
-          )}
-        </button>
+          onClick={toggleFavoritesDisplay}
+          className="p-2 rounded-full bg-blue-500 text-white shadow-md hover:bg-blue-700 focus:outline-none"
+        >
+           My Favorites
+          </button>
       </header>
-      <main className="max-w-7xl mx-auto px-4 py-8">
+      <main className=" max-w-7xl mx-auto px-4 py-8 min-h-screen  ">
         <form onSubmit={handleSubmit} className="mb-8">
           <div className="flex gap-4">
             <div className="flex-1 relative">
@@ -126,13 +110,13 @@ function App() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search for movies..."
-                className="w-full px-4 py-2 pl-10 rounded-lg border border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-black"
+                className="w-full p-2 pl-10 placeholder-gray-400dark:placeholder-gray-500 rounded-lg border border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-grey-900 dark :text-gray-100"
               />
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
             </div>
             <button
               type="submit"
-              className="px-6 py-2 bg-blue-600 text-black rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="px-4 py-2 bg-blue-500 text-black rounded-1g  hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 font-semibold"
               disabled={loading}
             >
               {loading ? 'Searching...' : 'Search'}
@@ -145,9 +129,11 @@ function App() {
         )}
 
         {favorites.length > 0 && (
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold mb-4">Favorites</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div id="favorites-section" className="mb-8 hidden">
+          <h2 className="text-2xl font-bold mb-4">Favorites</h2>
+         {/* added a new form for favorite */}
+          <form className='mb-8'>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {favorites.map((movie) => (
                 <MovieCard
                   key={movie.imdbID}
@@ -158,6 +144,7 @@ function App() {
                 />
               ))}
             </div>
+            </form>
           </div>
         )}
 
